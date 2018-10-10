@@ -30,10 +30,11 @@ environment (`RACK_ENV` or `RAILS_ENV`) settings for the Braspag API.
 ```yml
 # config/braspag-rest.yml
 development:
-  url: 'https://apisandbox.braspag.com.br'
-  query_url: 'https://apiquerysandbox.braspag.com.br'
-  merchant_id: 'Your MerchantId here'
-  merchant_key: 'Your MerchantKey here'
+  url: 'https://apisandbox.cieloecommerce.cielo.com.br'
+  query_url: 'https://apiquerysandbox.cieloecommerce.cielo.com.br'
+  oauth2_url: 'https://authsandbox.braspag.com.br/oauth2/token'
+  client_id: 'YOUR CLIENT ID'
+  client_secret: 'YOUR SECRET'
   request_timeout: 60
 ```
 
@@ -56,16 +57,18 @@ to handle configuration values that shouldn't be present in the source code.
 ```yml
 # config/braspag-rest.yml
 development:
-  url: 'https://apisandbox.braspag.com.br'
-  query_url: 'https://apiquerysandbox.braspag.com.br'
-  merchant_id: 'Your MerchantId here'
-  merchant_key: 'Your MerchantKey here'
+  url: 'https://apisandbox.cieloecommerce.cielo.com.br'
+  query_url: 'https://apiquerysandbox.cieloecommerce.cielo.com.br'
+  oauth2_url: 'https://authsandbox.braspag.com.br/oauth2/token'
+  client_id: 'YOUR CLIENT ID'
+  client_secret: 'YOUR SECRET'
   request_timeout: 60
 production:
   url: <%= ENV['BRASPAG_URL'] %>
   query_url: <%= ENV['BRASPAG_QUERY_URL'] %>
-  merchant_id: <%= ENV['BRASPAG_MERCHANT_ID'] %>
-  merchant_key: <%= ENV['BRASPAG_MERCHANT_KEY'] %>
+  oauth2_url: <%= ENV['BRASPAG_OAUTH2_URL'] %>
+  client_id: <%= ENV['BRASPAG_CLIENT_ID'] %>
+  client_secret: <%= ENV['BRASPAG_CLIENT_SECRET'] %>
   request_timeout: <%= ENV['BRASPAG_REQUEST_TIMEOUT'] %>
 ```
 
