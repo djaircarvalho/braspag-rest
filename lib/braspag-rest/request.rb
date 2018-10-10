@@ -1,7 +1,7 @@
 module BraspagRest
   class Request
     class << self
-      SALE_ENDPOINT = '/v2/sales/'
+      SALE_ENDPOINT = '/1/sales/'
       VOID_ENDPOINT = '/void'
       CAPTURE_ENDPOINT = '/capture'
 
