@@ -8,18 +8,18 @@ describe BraspagRest::Sale do
           'Interest' => 'ByMerchant',
           'Links' => [
              {
-                'Href' => 'https=>//apiqueryhomolog.braspag.com.br/v2/sales/1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1',
+                'Href' => 'https=>//apiquerysandbox.cieloecommerce.cielo.com.br/1/sales/1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1',
                 'Method' => 'GET',
                 'Rel' => 'self'
              },
              {
                 'Method' => 'PUT',
-                'Href' => 'https=>//apihomolog.braspag.com.br/v2/sales/1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1/capture',
+                'Href' => 'https=>//apisandbox.cieloecommerce.cielo.com.br/1/sales/1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1/capture',
                 'Rel' => 'capture'
              },
              {
                 'Rel' => 'void',
-                'Href' => 'https=>//apihomolog.braspag.com.br/v2/sales/1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1/void',
+                'Href' => 'https=>//apisandbox.cieloecommerce.cielo.com.br/1/sales/1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1/void',
                 'Method' => 'PUT'
              }
           ],

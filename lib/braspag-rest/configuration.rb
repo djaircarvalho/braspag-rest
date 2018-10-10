@@ -25,12 +25,16 @@ module BraspagRest
       config['query_url']
     end
 
-    def merchant_id
-      config['merchant_id']
+    def oauth2_url
+      config['oauth2_url']
     end
 
-    def merchant_key
-      config['merchant_key']
+    def client_id
+      config['client_id']
+    end
+
+    def client_secret
+      config['client_secret']
     end
 
     def request_timeout

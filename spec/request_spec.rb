@@ -5,6 +5,7 @@ describe BraspagRest::Request do
   let(:logger) { double(info: nil) }
 
   before do
+    allow_any_instance_of(BraspagRest::TokenManager).to receive(:token).and_return('Bearer eyJ0eXAiOiJ.KV1QiLCJhb.GciOiJIUzI1NiJ9')
     BraspagRest.config do |configuration|
       configuration.config_file_path = 'spec/fixtures/configuration.yml'
       configuration.environment = 'test'
@@ -13,16 +14,15 @@ describe BraspagRest::Request do
   end
 
   describe '.authorize' do
-    let(:sale_url) { config['url'] + '/v2/sales/' }
+    let(:sale_url) { config['url'] + '/1/sales/' }
     let(:request_id) { '30000000-0000-0000-0000-000000000001' }
 
     let(:headers) {
       {
         'Accept' => 'application/json',
         'Content-Type' => 'application/json',
-        'MerchantId' => config['merchant_id'],
-        'MerchantKey' => config['merchant_key'],
-        'RequestId' => request_id
+        'RequestId' => request_id,
+        'Authorization' => BraspagRest::TokenManager.token
       }
     }
 
@@ -98,14 +98,13 @@ describe BraspagRest::Request do
       {
         'Accept' => 'application/json',
         'Content-Type' => 'application/json',
-        'MerchantId' => config['merchant_id'],
-        'MerchantKey' => config['merchant_key'],
-        'RequestId' => request_id
+        'RequestId' => request_id,
+        'Authorization' => BraspagRest::TokenManager.token
       }
     }
 
     context "when no amount is given" do
-      let(:void_url) { config['url'] + '/v2/sales/' + payment_id + '/void' }
+      let(:void_url) { config['url'] + '/1/sales/' + payment_id + '/void' }
 
       it 'does not specify an amount to be voided' do
         expect(RestClient::Request).to receive(:execute).with(
@@ -119,7 +118,7 @@ describe BraspagRest::Request do
     end
 
     context "when an amount is given" do
-      let(:void_url) { config['url'] + '/v2/sales/' + payment_id + "/void?amount=#{amount}" }
+      let(:void_url) { config['url'] + '/1/sales/' + payment_id + "/void?amount=#{amount}" }
       let(:amount) { 100 }
 
       it 'includes specific amount to void in request' do
@@ -181,16 +180,15 @@ describe BraspagRest::Request do
 
   describe '.get_sale' do
     let(:payment_id) { '123456' }
-    let(:search_url) { config['query_url'] + '/v2/sales/' + payment_id }
+    let(:search_url) { config['query_url'] + '/1/sales/' + payment_id }
     let(:request_id) { '30000000-0000-0000-0000-000000000001' }
 
     let(:headers) {
       {
         'Accept' => 'application/json',
         'Content-Type' => 'application/json',
-        'MerchantId' => config['merchant_id'],
-        'MerchantKey' => config['merchant_key'],
-        'RequestId' => request_id
+        'RequestId' => request_id,
+        'Authorization' => BraspagRest::TokenManager.token
       }
     }
 
@@ -248,14 +246,14 @@ describe BraspagRest::Request do
     end
 
     it 'logs the requested url' do
-      expect(logger).to receive(:info).with("[BraspagRest][GetSale] endpoint: https://apiquerysandbox.braspag.com.br/v2/sales/?merchantOrderId=#{transaction_id}")
+      expect(logger).to receive(:info).with("[BraspagRest][GetSale] endpoint: https://apiquerysandbox.cieloecommerce.cielo.com.br/1/sales/?merchantOrderId=#{transaction_id}")
       BraspagRest::Request.get_sales_for_merchant_order_id(request_id, transaction_id)
     end
 
     it 'request with the correct parameters' do
       expect(RestClient::Request).to receive(:execute).with(
         method: :get,
-        url: "https://apiquerysandbox.braspag.com.br/v2/sales/?merchantOrderId=#{transaction_id}",
+        url: "https://apiquerysandbox.cieloecommerce.cielo.com.br/1/sales/?merchantOrderId=#{transaction_id}",
         headers: described_class.send(:default_headers).merge('RequestId' => request_id),
         timeout: BraspagRest.config.request_timeout
       )
@@ -265,7 +263,7 @@ describe BraspagRest::Request do
 
   describe '.capture' do
     let(:payment_id) { '123456' }
-    let(:capture_url) { config['url'] + '/v2/sales/' + payment_id + '/capture' }
+    let(:capture_url) { config['url'] + '/1/sales/' + payment_id + '/capture' }
     let(:request_id) { '30000000-0000-0000-0000-000000000001' }
     let(:amount) { 100 }
 
@@ -273,9 +271,8 @@ describe BraspagRest::Request do
       {
         'Accept' => 'application/json',
         'Content-Type' => 'application/json',
-        'MerchantId' => config['merchant_id'],
-        'MerchantKey' => config['merchant_key'],
-        'RequestId' => request_id
+        'RequestId' => request_id,
+        'Authorization' => BraspagRest::TokenManager.token
       }
     }
 
