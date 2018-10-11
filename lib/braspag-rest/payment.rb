@@ -42,6 +42,7 @@ module BraspagRest
     property :authenticate, from: 'Authenticate'
     property :soft_descriptor, from: 'SoftDescriptor'
     property :fraud_analysis, from: 'FraudAnalysis'
+    property :is_splitted, from: 'IsSplitted'
 
     # Response fields
     property :received_date, from: 'ReceivedDate'
@@ -62,6 +63,10 @@ module BraspagRest
       else
         initialize_errors(response.parsed_body) and return false
       end
+    end
+
+    def splitted?
+      is_splitted
     end
 
     def authorized?
