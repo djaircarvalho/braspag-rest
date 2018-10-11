@@ -96,7 +96,7 @@ module BraspagRest
       end
 
       def sale_url
-        config.url + SALE_ENDPOINT
+        config.api_url + SALE_ENDPOINT
       end
 
       def void_url(payment_id, amount)
