@@ -54,6 +54,16 @@ module BraspagRest
     coerce_key :refunds, Array[BraspagRest::Refund]
     coerce_key :split_payments, Array[BraspagRest::SplitPayment]
 
+    def split(splits)
+      response = BraspagRest::Request.split(id, splits)
+
+      if response.success?
+        initialize_attributes(response.parsed_body)
+      else
+        initialize_errors(response.parsed_body) and return false
+      end
+    end
+
     def authorized?
       status.to_i.eql?(STATUS_AUTHORIZED)
     end

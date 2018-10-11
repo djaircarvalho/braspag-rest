@@ -17,8 +17,8 @@ module BraspagRest
       config['log_enable'] && logger
     end
 
-    def api_url
-      config['api_url']
+    def url
+      config['url']
     end
 
     def query_url
