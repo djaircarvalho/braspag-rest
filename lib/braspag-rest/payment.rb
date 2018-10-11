@@ -24,6 +24,7 @@ module BraspagRest
     property :voided_amount, from: 'VoidedAmount'
     property :voided_date, from: 'VoidedDate'
 
+    property :split_payments, from: 'SplitPayments'
     property :refunds, from: 'Refunds'
 
     property :digitable_line, from: 'DigitableLine'
@@ -51,6 +52,7 @@ module BraspagRest
     coerce_key :fraud_analysis, BraspagRest::FraudAnalysis
     coerce_key :credit_card, BraspagRest::CreditCard
     coerce_key :refunds, Array[BraspagRest::Refund]
+    coerce_key :split_payments, Array[BraspagRest::SplitPayment]
 
     def authorized?
       status.to_i.eql?(STATUS_AUTHORIZED)
