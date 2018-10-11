@@ -17,12 +17,16 @@ module BraspagRest
       config['log_enable'] && logger
     end
 
-    def url
-      config['url']
+    def api_url
+      config['api_url']
     end
 
     def query_url
       config['query_url']
+    end
+
+    def split_url
+      config['split_url']
     end
 
     def oauth2_url
