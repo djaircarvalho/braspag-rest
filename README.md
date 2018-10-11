@@ -1,6 +1,6 @@
 # BraspagRest
 
-[![Travis-CI](https://travis-ci.org/Dinda-com-br/braspag-rest.svg?branch=master)](https://travis-ci.org/Dinda-com-br/braspag-rest)
+[![Build Status](https://travis-ci.org/djaircarvalho/braspag-rest.svg?branch=master)](https://travis-ci.org/djaircarvalho/braspag-rest) [![Maintainability](https://api.codeclimate.com/v1/badges/15604b125146a98c2bb8/maintainability)](https://codeclimate.com/github/djaircarvalho/braspag-rest/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/15604b125146a98c2bb8/test_coverage)](https://codeclimate.com/github/djaircarvalho/braspag-rest/test_coverage)
 
 Gem to use Braspag gateway in his REST version.
 
