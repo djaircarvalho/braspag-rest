@@ -1,13 +1,12 @@
 module BraspagRest
   class Request
     class << self
-      SALE_ENDPOINT = '/v2/sales/'
+      SALE_ENDPOINT = '/1/sales/'
       VOID_ENDPOINT = '/void'
       CAPTURE_ENDPOINT = '/capture'
 
       def authorize(request_id, params)
         config.logger.info("[BraspagRest][Authorize] endpoint: #{sale_url}, params: #{params.to_json}") if config.log_enabled?
-
         execute_braspag_request do
           RestClient::Request.execute(
             method: :post,
@@ -123,8 +122,7 @@ module BraspagRest
         {
           'Accept' => 'application/json',
           'Content-Type' => 'application/json',
-          'MerchantId' => config.merchant_id,
-          'MerchantKey' => config.merchant_key
+          'Authorization' => TokenManager.token
         }
       end
 

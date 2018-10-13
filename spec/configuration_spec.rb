@@ -10,10 +10,11 @@ describe BraspagRest::Configuration do
 
       expect(configuration.config_file_path).to eq('spec/fixtures/configuration.yml')
       expect(configuration.environment).to eq('test')
-      expect(configuration.url).to eq('https://apisandbox.braspag.com.br')
-      expect(configuration.query_url).to eq('https://apiquerysandbox.braspag.com.br')
-      expect(configuration.merchant_id).to eq('12345678-1234-1234-1234-123456789012')
-      expect(configuration.merchant_key).to eq('1234567890123456789012345678901234567890')
+      expect(configuration.url).to eq('https://apisandbox.cieloecommerce.cielo.com.br')
+      expect(configuration.query_url).to eq('https://apiquerysandbox.cieloecommerce.cielo.com.br')
+      expect(configuration.oauth2_url).to eq('https://authsandbox.braspag.com.br/oauth2/token')
+      expect(configuration.client_id).to eq('abf26594-b758-4a69-841d-e254285f7068')
+      expect(configuration.client_secret).to eq('i8xPgT2sdPGhAIy/RITggrRspLDbPleMOri9UXZ6Mr0=')
     end
   end
 
@@ -44,8 +45,8 @@ describe BraspagRest::Configuration do
       configuration.config_file_path = 'spec/fixtures/configuration.yml'
       configuration.environment = 'production'
 
-      ENV['BRASPAG_MERCHANT_KEY'] = 'MERCHANT_KEY_SET_THROUGH_ENV'
-      expect(configuration.merchant_key).to eq('MERCHANT_KEY_SET_THROUGH_ENV')
+      ENV['BRASPAG_CLIENT_SECRET'] = 'BRASPAG_CLIENT_SECRET_SET_THROUGH_ENV'
+      expect(configuration.client_secret).to eq('BRASPAG_CLIENT_SECRET_SET_THROUGH_ENV')
     end
   end
 end
