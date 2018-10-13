@@ -4,6 +4,7 @@ module BraspagRest
       SALE_ENDPOINT = '/1/sales/'
       VOID_ENDPOINT = '/void'
       CAPTURE_ENDPOINT = '/capture'
+      SPLIT_ENDPOINT = '/split'
 
       def authorize(request_id, params)
         config.logger.info("[BraspagRest][Authorize] endpoint: #{sale_url}, params: #{params.to_json}") if config.log_enabled?
@@ -71,6 +72,20 @@ module BraspagRest
         end
       end
 
+      def split(payment_id, splits)
+        config.logger.info("[BraspagRest][Split] endpoint: #{split_url(payment_id)}, splits: #{splits}") if config.log_enabled?
+
+        execute_braspag_request do
+          RestClient::Request.execute(
+            method: :put,
+            url: split_url(payment_id),
+            payload: splits.map { |split| split.inverse_attributes },
+            headers: default_headers,
+            timeout: config.request_timeout
+          )
+        end
+      end
+
       private
 
       def execute_braspag_request(&block)
@@ -109,6 +124,10 @@ module BraspagRest
 
       def capture_url(payment_id)
         sale_url + payment_id.to_s + CAPTURE_ENDPOINT
+      end
+
+      def split_url(payment_id)
+        config.split_url + payment_id.to_s + SPLIT_ENDPOINT
       end
 
       def search_sales_for_merchant_order_id_url(merchant_order_id)

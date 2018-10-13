@@ -25,6 +25,10 @@ module BraspagRest
       config['query_url']
     end
 
+    def split_url
+      config['split_url']
+    end
+
     def oauth2_url
       config['oauth2_url']
     end

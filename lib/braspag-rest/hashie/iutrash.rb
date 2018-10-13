@@ -4,6 +4,8 @@ module Hashie
   class IUTrash < Hashie::IUDash
     include Hashie::Extensions::Dash::PropertyTranslation
 
+    attr_reader :errors
+
     def inverse_attributes
       self.class.translations.each_with_object({}) do |(from, property), attributes|
         value = nested_inverse(self.send(property))
@@ -26,6 +28,10 @@ module Hashie
 
     def attributes_for(value)
       value.respond_to?(:inverse_attributes) ? value.inverse_attributes : value
+    end
+
+    def initialize_errors(errors)
+      @errors = errors.map { |error| { code: error['Code'], message: error['Message'] } }
     end
   end
 end

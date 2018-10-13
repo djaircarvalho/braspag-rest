@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe BraspagRest::Payment do
-  let(:credit_card_payment) {
+  let(:credit_card_payment) do
     {
       'ReasonMessage' => 'Successful',
       'Interest' => 'ByMerchant',
@@ -40,9 +40,10 @@ describe BraspagRest::Payment do
       'Provider' => 'Simulado',
       'Currency' => 'BRL',
       'ProviderReturnMessage' => 'Operation Successful',
-      'Amount' => 15700,
+      'IsSplitted' => false,
+      'Amount' => 15_700,
       'BoletoNumber' => '2017091101',
-      'CapturedAmount' => 15800,
+      'CapturedAmount' => 15_800,
       'Type' => 'CreditCard',
       'AuthorizationCode' => '058475',
       'PaymentId' => '1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1',
@@ -53,9 +54,102 @@ describe BraspagRest::Payment do
       'VoidedDate' => '2015-06-25 10:18:32',
       'Status' => 1
     }
-  }
+  end
 
-  let(:boleto_payment) {
+  let(:splitted_credit_card_payment) do
+    {
+      'ReasonMessage' => 'Successful',
+      'Interest' => 'ByMerchant',
+      'Links' => [
+        {
+          'Href' => 'https=>//apiqueryhomolog.braspag.com.br/v2/sales/1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1',
+          'Method' => 'GET',
+          'Rel' => 'self'
+        },
+        {
+          'Method' => 'PUT',
+          'Href' => 'https=>//apihomolog.braspag.com.br/v2/sales/1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1/capture',
+          'Rel' => 'capture'
+        },
+        {
+          'Rel' => 'void',
+          'Href' => 'https=>//apihomolog.braspag.com.br/v2/sales/1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1/void',
+          'Method' => 'PUT'
+        }
+      ],
+      'ServiceTaxAmount' => 0,
+      'Country' => 'BRA',
+      'AcquirerTransactionId' => '0625101832104',
+      'CreditCard' => {
+        'ExpirationDate' => '12/2021',
+        'SaveCard' => false,
+        'Brand' => 'Visa',
+        'CardNumber' => '000000******0001',
+        'Holder' => 'Teste Holder'
+      },
+      'ReceivedDate' => '2015-06-25 10:18:32',
+      'ProviderReturnCode' => '4',
+      'ReasonCode' => 0,
+      'ProofOfSale' => '1832104',
+      'Capture' => false,
+      'Provider' => 'Simulado',
+      'Currency' => 'BRL',
+      'ProviderReturnMessage' => 'Operation Successful',
+      'Amount' => 15_700,
+      'BoletoNumber' => '2017091101',
+      'CapturedAmount' => 15_800,
+      'IsSplitted' => true,
+      'Type' => 'SplittedCreditCard',
+      'AuthorizationCode' => '058475',
+      'PaymentId' => '1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1',
+      'Authenticate' => false,
+      'Installments' => 1,
+      'Recurrent' => false,
+      'VoidedAmount' => 1245,
+      'VoidedDate' => '2015-06-25 10:18:32',
+      'Status' => 1,
+      'SplitPayments' => [
+        {
+          'SubordinateMerchantId' => '20943d1a-153f-42b6-93b8-07b9db000651',
+          'Amount' => 6000,
+          'Fares' => {
+            'Mdr' => 2,
+            'Fee' => 30
+          },
+          'Splits' => [
+            {
+              'MerchantId' => '20943d1a-153f-42b6-93b8-07b9db000651',
+              'Amount' => 5850
+            },
+            {
+              'MerchantId' => 'abf26594-b758-4a69-841d-e254285f7068',
+              'Amount' => 150
+            }
+          ]
+        },
+        {
+          'SubordinateMerchantId' => 'a4133798-9fac-4592-b040-d62d8239bd97',
+          'Amount' => 4000,
+          'Fares' => {
+            'Mdr' => 2,
+            'Fee' => 30
+          },
+          'Splits' => [
+            {
+              'MerchantId' => 'a4133798-9fac-4592-b040-d62d8239bd97',
+              'Amount' => 3890
+            },
+            {
+              'MerchantId' => 'abf26594-b758-4a69-841d-e254285f7068',
+              'Amount' => 110
+            }
+          ]
+        }
+      ]
+    }
+  end
+
+  let(:boleto_payment) do
     {
       'Address' => 'N/A, 1',
       'Amount' => 1150,
@@ -84,16 +178,15 @@ describe BraspagRest::Payment do
       'Type' => 'Boleto',
       'Url' => 'https://sandbox.pagador.com.br/post/pagador/reenvia.asp/795cc546-8d3c-4ff3-8548-77320fc4b595'
     }
-  }
-
+  end
   describe '.new' do
     subject(:payment) { BraspagRest::Payment.new(credit_card_payment) }
 
     it 'initializes a payment using braspag response format' do
       expect(payment.type).to eq('CreditCard')
-      expect(payment.amount).to eq(15700)
+      expect(payment.amount).to eq(15_700)
       expect(payment.boleto_number).to eq('2017091101')
-      expect(payment.captured_amount).to eq(15800)
+      expect(payment.captured_amount).to eq(15_800)
       expect(payment.provider).to eq('Simulado')
       expect(payment.installments).to eq(1)
       expect(payment.credit_card).to be_an_instance_of(BraspagRest::CreditCard)
@@ -104,6 +197,47 @@ describe BraspagRest::Payment do
       expect(payment.authorization_code).to eq('058475')
       expect(payment.reason_code).to eq(0)
       expect(payment.reason_message).to eq('Successful')
+      expect(payment.is_splitted).to be_falsey
+      expect(payment).not_to be_splitted
+    end
+  end
+
+  describe '.new_splitted' do
+    subject(:payment_splitted) { BraspagRest::Payment.new(splitted_credit_card_payment) }
+
+    it 'initializes a splitted payment using braspag response format' do
+      expect(payment_splitted.type).to eq('SplittedCreditCard')
+      expect(payment_splitted.amount).to eq(15_700)
+      expect(payment_splitted.boleto_number).to eq('2017091101')
+      expect(payment_splitted.captured_amount).to eq(15_800)
+      expect(payment_splitted.provider).to eq('Simulado')
+      expect(payment_splitted.installments).to eq(1)
+      expect(payment_splitted.credit_card).to be_an_instance_of(BraspagRest::CreditCard)
+      expect(payment_splitted.status).to eq(1)
+      expect(payment_splitted.id).to eq('1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1')
+      expect(payment_splitted.transaction_id).to eq('0625101832104')
+      expect(payment_splitted.proof_of_sale).to eq('1832104')
+      expect(payment_splitted.authorization_code).to eq('058475')
+      expect(payment_splitted.reason_code).to eq(0)
+      expect(payment_splitted.reason_message).to eq('Successful')
+      expect(payment_splitted.is_splitted).to be_truthy
+      expect(payment_splitted).to be_splitted
+      expect(payment_splitted.split_payments[0].subordinate_merchant_id).to eq('20943d1a-153f-42b6-93b8-07b9db000651')
+      expect(payment_splitted.split_payments[0].amount).to eq(6000)
+      expect(payment_splitted.split_payments[0].fares.mdr).to eq(2)
+      expect(payment_splitted.split_payments[0].fares.fee).to eq(30)
+      expect(payment_splitted.split_payments[0].splits[0].merchant_id).to eq('20943d1a-153f-42b6-93b8-07b9db000651')
+      expect(payment_splitted.split_payments[0].splits[0].amount).to eq(5850)
+      expect(payment_splitted.split_payments[0].splits[1].merchant_id).to eq('abf26594-b758-4a69-841d-e254285f7068')
+      expect(payment_splitted.split_payments[0].splits[1].amount).to eq(150)
+      expect(payment_splitted.split_payments[1].subordinate_merchant_id).to eq('a4133798-9fac-4592-b040-d62d8239bd97')
+      expect(payment_splitted.split_payments[1].amount).to eq(4000)
+      expect(payment_splitted.split_payments[1].fares.mdr).to eq(2)
+      expect(payment_splitted.split_payments[1].fares.fee).to eq(30)
+      expect(payment_splitted.split_payments[1].splits[0].merchant_id).to eq('a4133798-9fac-4592-b040-d62d8239bd97')
+      expect(payment_splitted.split_payments[1].splits[0].amount).to eq(3890)
+      expect(payment_splitted.split_payments[1].splits[1].merchant_id).to eq('abf26594-b758-4a69-841d-e254285f7068')
+      expect(payment_splitted.split_payments[1].splits[1].amount).to eq(110)
     end
   end
 
@@ -183,6 +317,17 @@ describe BraspagRest::Payment do
 
       it 'returns not refunded' do
         expect(sale).not_to be_refunded
+      end
+    end
+  end
+
+  describe '#splitted?' do
+    let(:payment) { BraspagRest::Payment.new(splitted_credit_card_payment) }
+
+    context 'when splitted' do
+
+      it 'returns splitted' do
+        expect(payment).to be_splitted
       end
     end
   end
