@@ -142,7 +142,8 @@ module BraspagRest
         {
           'Accept' => 'application/json',
           'Content-Type' => 'application/json',
-          'Authorization' => TokenManager.token
+          'Authorization' => TokenManager.token,
+          'Content-Length' => 0
         }
       end
 
