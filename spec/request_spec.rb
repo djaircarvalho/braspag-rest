@@ -235,7 +235,7 @@ describe BraspagRest::Request do
     end
   end
 
-  describe '.split' do
+  describe '#split' do
     let(:payment_id) { '123456' }
     let(:split_url) { config['split_url'] + payment_id + '/split' }
     let(:request_id) { '30000000-0000-0000-0000-000000000001' }
@@ -277,7 +277,7 @@ describe BraspagRest::Request do
         expect(RestClient::Request).to receive(:execute).with(
           method: :put,
           url: split_url,
-          payload: [split1.inverse_attributes, split2.inverse_attributes],
+          payload: [split1.inverse_attributes, split2.inverse_attributes].to_json,
           headers: headers,
           timeout: config['request_timeout']
         )

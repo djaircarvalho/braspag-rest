@@ -211,8 +211,8 @@ sales.map { |sale| sale.customer.name }
 ### Split a sale
 
 ```rb
-split1 = BraspagRest::SplitPayment.new(subordinate_merchant_id: 'a4133798-9fac-4592-b040-d62d8239bd97', amount: 4000, fares: {mdr: 2, fee: 30})
-split2 = BraspagRest::SplitPayment.new(subordinate_merchant_id: '20943d1a-153f-42b6-93b8-07b9db000651', amount: 6000, fares: {mdr: 2, fee: 30})
+split1 = BraspagRest::SplitPayment.new(subordinate_merchant_id: 'a4133798-9fac-4592-b040-d62d8239bd97', amount: 4000, fares: BraspagRest::Fare.new({mdr: 2, fee: 30}))
+split2 = BraspagRest::SplitPayment.new(subordinate_merchant_id: '20943d1a-153f-42b6-93b8-07b9db000651', amount: 6000, fares: BraspagRest::Fare.new({mdr: 2, fee: 30}))
 
 sale.payment.split([split1, split2])
 ```
