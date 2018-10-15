@@ -1,4 +1,6 @@
+# -*- encoding : utf-8 -*-
 require 'spec_helper'
+require 'securerandom'
 
 describe BraspagRest::TokenManager do
   let(:headers) do
@@ -22,7 +24,7 @@ describe BraspagRest::TokenManager do
           url: BraspagRest.config.oauth2_url,
           headers: headers,
           payload: 'grant_type=client_credentials'
-        ).and_return({ access_token: 'tokenencriptado', "expires_in": 86_399 }.to_json)
+        ).and_return({ access_token: 'tokenencriptado', "expires_in" => 86_399 }.to_json)
 
         expect(BraspagRest::TokenManager.token).to eq('Bearer tokenencriptado')
       end

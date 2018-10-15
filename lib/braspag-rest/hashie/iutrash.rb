@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 require 'hashie/extensions/dash/property_translation'
 
 module Hashie

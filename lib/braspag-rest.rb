@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module BraspagRest
   def self.config
     @config ||= BraspagRest::Configuration.new

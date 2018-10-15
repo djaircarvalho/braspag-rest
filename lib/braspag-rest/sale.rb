@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module BraspagRest
   class Sale < Hashie::IUTrash
     include Hashie::Extensions::Coercion

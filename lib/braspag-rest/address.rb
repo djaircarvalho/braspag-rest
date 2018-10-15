@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module BraspagRest
   class Address < Hashie::IUTrash
     property :street, from: 'Street'

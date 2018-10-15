@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module BraspagRest
   class FraudAnalysis < Hashie::IUTrash
     include Hashie::Extensions::Coercion

@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module BraspagRest
   class Customer < Hashie::IUTrash
     property :name, from: 'Name'

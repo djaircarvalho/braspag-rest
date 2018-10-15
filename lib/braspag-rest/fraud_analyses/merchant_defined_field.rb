@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module BraspagRest
   module FraudAnalyses
     class MerchantDefinedFields < Hashie::IUTrash

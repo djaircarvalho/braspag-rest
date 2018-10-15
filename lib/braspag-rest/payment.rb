@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module BraspagRest
   class Payment < Hashie::IUTrash
     include Hashie::Extensions::Coercion

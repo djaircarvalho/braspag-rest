@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module BraspagRest
   class CreditCard < Hashie::IUTrash
     property :number, from: 'CardNumber'
