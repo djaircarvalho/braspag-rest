@@ -2,6 +2,7 @@ test:
   url: 'https://apisandbox.cieloecommerce.cielo.com.br'
   query_url: 'https://apiquerysandbox.cieloecommerce.cielo.com.br'
   oauth2_url: 'https://authsandbox.braspag.com.br/oauth2/token'
+  split_url: 'https://splitsandbox.braspag.com.br/api/transactions/'
   client_id: 'abf26594-b758-4a69-841d-e254285f7068'
   client_secret: 'i8xPgT2sdPGhAIy/RITggrRspLDbPleMOri9UXZ6Mr0='
   request_timeout: 60
