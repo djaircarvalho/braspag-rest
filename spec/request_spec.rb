@@ -23,7 +23,8 @@ describe BraspagRest::Request do
         'Accept' => 'application/json',
         'Content-Type' => 'application/json',
         'RequestId' => request_id,
-        'Authorization' => BraspagRest::TokenManager.token
+        'Authorization' => BraspagRest::TokenManager.token,
+        'Content-Length' => 0
       }
     end
 
@@ -100,7 +101,8 @@ describe BraspagRest::Request do
         'Accept' => 'application/json',
         'Content-Type' => 'application/json',
         'RequestId' => request_id,
-        'Authorization' => BraspagRest::TokenManager.token
+        'Authorization' => BraspagRest::TokenManager.token,
+        'Content-Length' => 0
       }
     end
 
@@ -189,7 +191,8 @@ describe BraspagRest::Request do
         'Accept' => 'application/json',
         'Content-Type' => 'application/json',
         'RequestId' => request_id,
-        'Authorization' => BraspagRest::TokenManager.token
+        'Authorization' => BraspagRest::TokenManager.token,
+        'Content-Length' => 0
       }
     end
 
@@ -245,7 +248,8 @@ describe BraspagRest::Request do
       {
         'Accept' => 'application/json',
         'Content-Type' => 'application/json',
-        'Authorization' => BraspagRest::TokenManager.token
+        'Authorization' => BraspagRest::TokenManager.token,
+        'Content-Length' => 0
       }
     end
 
@@ -352,7 +356,8 @@ describe BraspagRest::Request do
         'Accept' => 'application/json',
         'Content-Type' => 'application/json',
         'RequestId' => request_id,
-        'Authorization' => BraspagRest::TokenManager.token
+        'Authorization' => BraspagRest::TokenManager.token,
+        'Content-Length' => 0
       }
     end
 
