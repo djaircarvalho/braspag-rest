@@ -321,11 +321,65 @@ describe BraspagRest::Payment do
     end
   end
 
+  describe '#split' do
+    let(:split1) do
+      BraspagRest::SplitPayment.new(
+        subordinate_merchant_id: 'a4133798-9fac-4592-b040-d62d8239bd97',
+        amount:  6000,
+        fares:  {
+          mdr:  5,
+          fee:  30
+        }
+      )
+    end
+
+    let(:split2) do
+      BraspagRest::SplitPayment.new(
+        subordinate_merchant_id: '20943d1a-153f-42b6-93b8-07b9db000651',
+        amount: 4000,
+        fares: {
+          mdr: 4,
+          fee: 15
+        }
+      )
+    end
+
+    before { allow(BraspagRest::Request).to receive(:split).and_return(response) }
+
+    subject(:splitted_payment) { BraspagRest::Payment.new(splitted_credit_card_payment) }
+
+    context 'when the gateway returns a successful response' do
+      let(:parsed_body) {
+        { 'Payment' => { 'Status' => 1, 'PaymentId' => '1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1' } }
+      }
+
+      let(:response) { double(success?: true, parsed_body: parsed_body) }
+
+      it 'returns true and fills the sale object with the return' do
+        expect(splitted_payment.split([split1, split2])).to be_truthy
+        expect(splitted_payment.status).to eq(1)
+        expect(splitted_payment.id).to eq('1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1')
+      end
+    end
+
+    context 'when the gateway returns a failure' do
+      let(:parsed_body) {
+        [{ 'Code' => 123, 'Message' => 'MerchantOrderId cannot be null' }]
+      }
+
+      let(:response) { double(success?: false, parsed_body: parsed_body) }
+
+      it 'returns false and fills the errors attribute' do
+        expect(splitted_payment.split([split1, split2])).to be_falsey
+        expect(splitted_payment.errors).to eq([{ code: 123, message: "MerchantOrderId cannot be null" }])
+      end
+    end
+  end
+
   describe '#splitted?' do
     let(:payment) { BraspagRest::Payment.new(splitted_credit_card_payment) }
 
     context 'when splitted' do
-
       it 'returns splitted' do
         expect(payment).to be_splitted
       end

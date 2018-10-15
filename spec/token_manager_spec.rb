@@ -27,5 +27,20 @@ describe BraspagRest::TokenManager do
         expect(BraspagRest::TokenManager.token).to eq('Bearer tokenencriptado')
       end
     end
+
+    context 'has an access_token' do
+      it 'token invalid' do
+        allow_any_instance_of(BraspagRest::TokenManager).to receive(:token_valid?).and_return(false)
+        expect_any_instance_of(BraspagRest::TokenManager).to receive(:request_token).once
+        BraspagRest::TokenManager.token
+      end
+      it 'token valid' do
+        allow_any_instance_of(BraspagRest::TokenManager).to receive(:token_valid?).and_return(true)
+        expect_any_instance_of(BraspagRest::TokenManager).not_to receive(:request_token)
+        BraspagRest::TokenManager.token
+      end
+    end
+
   end
+
 end

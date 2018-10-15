@@ -79,7 +79,7 @@ module BraspagRest
           RestClient::Request.execute(
             method: :put,
             url: split_url(payment_id),
-            payload: splits.map { |split| split.inverse_attributes },
+            payload: splits.map { |split| split.inverse_attributes }.to_json,
             headers: default_headers,
             timeout: config.request_timeout
           )
