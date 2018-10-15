@@ -2,7 +2,7 @@
 require 'spec_helper'
 
 describe BraspagRest::Request do
-  let(:config) { YAML.safe_load(File.read('spec/fixtures/configuration.yml'))['test'] }
+  let(:config) { YAML.load(File.read('spec/fixtures/configuration.yml'))['test'] }
   let(:logger) { double(info: nil) }
 
   before do
