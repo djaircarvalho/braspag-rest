@@ -41,7 +41,6 @@ describe BraspagRest::Payment do
       'Provider' => 'Simulado',
       'Currency' => 'BRL',
       'ProviderReturnMessage' => 'Operation Successful',
-      'IsSplitted' => false,
       'Amount' => 15_700,
       'BoletoNumber' => '2017091101',
       'CapturedAmount' => 15_800,
@@ -57,7 +56,7 @@ describe BraspagRest::Payment do
     }
   end
 
-  let(:splitted_credit_card_payment) do
+  let(:splitted_credit_card_payment_captured) do
     {
       'ReasonMessage' => 'Successful',
       'Interest' => 'ByMerchant',
@@ -99,7 +98,6 @@ describe BraspagRest::Payment do
       'Amount' => 15_700,
       'BoletoNumber' => '2017091101',
       'CapturedAmount' => 15_800,
-      'IsSplitted' => true,
       'Type' => 'SplittedCreditCard',
       'AuthorizationCode' => '058475',
       'PaymentId' => '1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1',
@@ -108,7 +106,7 @@ describe BraspagRest::Payment do
       'Recurrent' => false,
       'VoidedAmount' => 1245,
       'VoidedDate' => '2015-06-25 10:18:32',
-      'Status' => 1,
+      'Status' => 2,
       'SplitPayments' => [
         {
           'SubordinateMerchantId' => '20943d1a-153f-42b6-93b8-07b9db000651',
@@ -146,6 +144,56 @@ describe BraspagRest::Payment do
             }
           ]
         }
+      ]
+    }
+  end
+
+  let(:splitted_credit_card_payment_authorized) do
+    {
+      'ServiceTaxAmount' => 0,
+      'Installments' => 1,
+      'Interest' => 0,
+      'Capture' => false,
+      'Authenticate' => false,
+      'Recurrent' => false,
+      'CreditCard' => {
+        'CardNumber' => '000000******0001',
+            'Holder' => 'Teste Holder',
+            'ExpirationDate' => '12/2021',
+            'SaveCard' => false,
+            'Brand' => 'Visa'
+      },
+      'Tid' => '1016101051753',
+      'ProofOfSale' => '1051753',
+      'AuthorizationCode' => '112504',
+      'Provider' => 'Simulado',
+      'SplitPayments' => [],
+      'Amount' => 10_000,
+      'ReceivedDate' => '2018-10-16 10:10:51',
+      'Status' => 1,
+      'IsSplitted' => true,
+      'ReturnMessage' => 'Operation Successful',
+      'ReturnCode' => '4',
+      'PaymentId' => 'c691daf5-a5cf-4e5c-82f8-3deaaaeeb13f',
+      'Type' => 'SplittedCreditCard',
+      'Currency' => 'BRL',
+      'Country' => 'BRA',
+      'Links' => [
+        {
+          'Method' => 'GET',
+          'Rel' => 'self',
+          'Href' => 'https://apiquerysandbox.cieloecommerce.cielo.com.br/1/sales/c691daf5-a5cf-4e5c-82f8-3deaaaeeb13f'
+        },
+            {
+              'Method' => 'PUT',
+              'Rel' => 'capture',
+              'Href' => 'https://apisandbox.cieloecommerce.cielo.com.br/1/sales/c691daf5-a5cf-4e5c-82f8-3deaaaeeb13f/capture'
+            },
+            {
+              'Method' => 'PUT',
+              'Rel' => 'void',
+              'Href' => 'https://apisandbox.cieloecommerce.cielo.com.br/1/sales/c691daf5-a5cf-4e5c-82f8-3deaaaeeb13f/void'
+            }
       ]
     }
   end
@@ -198,13 +246,11 @@ describe BraspagRest::Payment do
       expect(payment.authorization_code).to eq('058475')
       expect(payment.reason_code).to eq(0)
       expect(payment.reason_message).to eq('Successful')
-      expect(payment.is_splitted).to be_falsey
-      expect(payment).not_to be_splitted
     end
   end
 
   describe '.new_splitted' do
-    subject(:payment_splitted) { BraspagRest::Payment.new(splitted_credit_card_payment) }
+    subject(:payment_splitted) { BraspagRest::Payment.new(splitted_credit_card_payment_captured) }
 
     it 'initializes a splitted payment using braspag response format' do
       expect(payment_splitted.type).to eq('SplittedCreditCard')
@@ -214,15 +260,13 @@ describe BraspagRest::Payment do
       expect(payment_splitted.provider).to eq('Simulado')
       expect(payment_splitted.installments).to eq(1)
       expect(payment_splitted.credit_card).to be_an_instance_of(BraspagRest::CreditCard)
-      expect(payment_splitted.status).to eq(1)
+      expect(payment_splitted.status).to eq(2)
       expect(payment_splitted.id).to eq('1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1')
       expect(payment_splitted.transaction_id).to eq('0625101832104')
       expect(payment_splitted.proof_of_sale).to eq('1832104')
       expect(payment_splitted.authorization_code).to eq('058475')
       expect(payment_splitted.reason_code).to eq(0)
       expect(payment_splitted.reason_message).to eq('Successful')
-      expect(payment_splitted.is_splitted).to be_truthy
-      expect(payment_splitted).to be_splitted
       expect(payment_splitted.split_payments[0].subordinate_merchant_id).to eq('20943d1a-153f-42b6-93b8-07b9db000651')
       expect(payment_splitted.split_payments[0].amount).to eq(6000)
       expect(payment_splitted.split_payments[0].fares.mdr).to eq(2)
@@ -345,63 +389,71 @@ describe BraspagRest::Payment do
       )
     end
 
-    before { allow(BraspagRest::Request).to receive(:split).and_return(response) }
+    context 'payment authorized' do
+      subject(:splitted_payment) { BraspagRest::Payment.new(splitted_credit_card_payment_authorized) }
 
-    subject(:splitted_payment) { BraspagRest::Payment.new(splitted_credit_card_payment) }
-
-    context 'when the gateway returns a successful response' do
-      let(:parsed_body) do
-        { 'Payment' => { 'Status' => 1, 'PaymentId' => '1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1' } }
-      end
-
-      let(:response) { double(success?: true, parsed_body: parsed_body) }
-
-      it 'returns true and fills the sale object with the return' do
-        expect(splitted_payment.split([split1, split2])).to be_truthy
-        expect(splitted_payment.status).to eq(1)
-        expect(splitted_payment.id).to eq('1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1')
+      it 'BraspagRest::NotCapturedError' do
+        expect { splitted_payment.split([split1, split2]) }.to raise_error(BraspagRest::NotCapturedError)
       end
     end
 
-    context 'when the gateway returns a failure and the body is an Array' do
-      let(:parsed_body) do
-        [{ 'Code' => 123, 'Message' => 'MerchantOrderId cannot be null' }]
-      end
+    context 'raises payment not of type SplittedCreditCard' do
+      subject(:splitted_payment) { BraspagRest::Payment.new(credit_card_payment) }
 
-      let(:response) { double(success?: false, parsed_body: parsed_body) }
-
-      it 'returns false and fills the errors attribute' do
-        expect(splitted_payment.split([split1, split2])).to be_falsey
-        expect(splitted_payment.errors).to eq([{ code: 123, message: 'MerchantOrderId cannot be null' }])
+      it 'raises BraspagRest::NotSplittablePaymentError' do
+        expect { splitted_payment.split([split1, split2]) }.to raise_error(BraspagRest::NotSplittablePaymentError)
       end
     end
 
-    context 'when the gateway returns a failure and the body is a Hash' do
-      let(:parsed_body) do
-        {
-          'Errors' => [
-            {
-              'Message' => 'No one value can be negative'
-            }
-          ]
-        }
+    context 'captured payment' do
+      before { allow(BraspagRest::Request).to receive(:split).and_return(response) }
+
+      subject(:splitted_payment) { BraspagRest::Payment.new(splitted_credit_card_payment_captured) }
+
+      context 'when the gateway returns a successful response' do
+        let(:parsed_body) do
+          { 'Payment' => { 'Status' => 2, 'PaymentId' => '1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1' } }
+        end
+
+        let(:response) { double(success?: true, parsed_body: parsed_body) }
+
+        it 'returns true and fills the sale object with the return' do
+          expect(splitted_payment.split([split1, split2])).to be_truthy
+          expect(splitted_payment.status).to eq(2)
+          expect(splitted_payment.id).to eq('1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1')
+        end
       end
 
-      let(:response) { double(success?: false, parsed_body: parsed_body) }
+      context 'when the gateway returns a failure and the body is an Array' do
+        let(:parsed_body) do
+          [{ 'Code' => 123, 'Message' => 'MerchantOrderId cannot be null' }]
+        end
 
-      it 'returns false and fills the errors attribute' do
-        expect(splitted_payment.split([split1, split2])).to be_falsey
-        expect(splitted_payment.errors).to eq([{ code: nil, message: 'No one value can be negative' }])
+        let(:response) { double(success?: false, parsed_body: parsed_body) }
+
+        it 'returns false and fills the errors attribute' do
+          expect(splitted_payment.split([split1, split2])).to be_falsey
+          expect(splitted_payment.errors).to eq([{ code: 123, message: 'MerchantOrderId cannot be null' }])
+        end
       end
-    end
-  end
 
-  describe '#splitted?' do
-    let(:payment) { BraspagRest::Payment.new(splitted_credit_card_payment) }
+      context 'when the gateway returns a failure and the body is a Hash' do
+        let(:parsed_body) do
+          {
+            'Errors' => [
+              {
+                'Message' => 'No one value can be negative'
+              }
+            ]
+          }
+        end
 
-    context 'when splitted' do
-      it 'returns splitted' do
-        expect(payment).to be_splitted
+        let(:response) { double(success?: false, parsed_body: parsed_body) }
+
+        it 'returns false and fills the errors attribute' do
+          expect(splitted_payment.split([split1, split2])).to be_falsey
+          expect(splitted_payment.errors).to eq([{ code: nil, message: 'No one value can be negative' }])
+        end
       end
     end
   end

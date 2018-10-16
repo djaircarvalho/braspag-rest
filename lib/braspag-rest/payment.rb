@@ -43,7 +43,6 @@ module BraspagRest
     property :authenticate, from: 'Authenticate'
     property :soft_descriptor, from: 'SoftDescriptor'
     property :fraud_analysis, from: 'FraudAnalysis'
-    property :is_splitted, from: 'IsSplitted'
 
     # Response fields
     property :received_date, from: 'ReceivedDate'
@@ -57,6 +56,9 @@ module BraspagRest
     coerce_key :split_payments, Array[BraspagRest::SplitPayment]
 
     def split(splits)
+      raise BraspagRest::NotSplittablePaymentError unless splitted?
+      raise BraspagRest::NotCapturedError unless captured?
+
       response = BraspagRest::Request.split(id, splits)
 
       if response.success?
@@ -64,10 +66,7 @@ module BraspagRest
       else
         initialize_errors(response.parsed_body) and return false
       end
-    end
-
-    def splitted?
-      is_splitted
+      true
     end
 
     def authorized?
@@ -84,6 +83,10 @@ module BraspagRest
 
     def refunded?
       status.to_i.eql?(STATUS_REFUNDED)
+    end
+
+    def splitted?
+      type == 'SplittedCreditCard'
     end
   end
 end

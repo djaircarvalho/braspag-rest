@@ -6,9 +6,10 @@ module BraspagRest
     @config
   end
 end
-
 require 'hashie'
 require 'rest-client'
+require 'braspag-rest/errors/not_captured_error'
+require 'braspag-rest/errors/not_splittable_payment_error'
 require 'braspag-rest/hashie'
 require 'braspag-rest/version'
 require 'braspag-rest/configuration'
