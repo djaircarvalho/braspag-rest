@@ -4,6 +4,7 @@ module BraspagRest
 
     property :request_id, from: 'RequestId'
     property :order_id, from: 'MerchantOrderId'
+    property :is_splitted, from: 'IsSplitted'
     property :customer, from: 'Customer', with: ->(values) { BraspagRest::Customer.new(values) }
     property :payment, from: 'Payment', with: ->(values) { BraspagRest::Payment.new(values) }
 
@@ -66,6 +67,10 @@ module BraspagRest
       end
 
       self
+    end
+
+    def splitted?
+      payment.splitted?
     end
   end
 end
