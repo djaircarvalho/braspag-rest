@@ -4,9 +4,10 @@ module BraspagRest
     
     property :subordinate_merchant_id, from: 'SubordinateMerchantId'
     property :amount, from: 'Amount'
-    property :fares, from: 'Fares', with: ->(values) { BraspagRest::Fare.new(values) }
+    property :fares, from: 'Fares'
     property :splits, from: 'Splits'
 
     coerce_key :splits, Array[BraspagRest::Split]
+    coerce_key :fares, BraspagRest::Fare
   end
 end
