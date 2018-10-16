@@ -350,9 +350,9 @@ describe BraspagRest::Payment do
     subject(:splitted_payment) { BraspagRest::Payment.new(splitted_credit_card_payment) }
 
     context 'when the gateway returns a successful response' do
-      let(:parsed_body) {
+      let(:parsed_body) do
         { 'Payment' => { 'Status' => 1, 'PaymentId' => '1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1' } }
-      }
+      end
 
       let(:response) { double(success?: true, parsed_body: parsed_body) }
 
@@ -363,16 +363,35 @@ describe BraspagRest::Payment do
       end
     end
 
-    context 'when the gateway returns a failure' do
-      let(:parsed_body) {
+    context 'when the gateway returns a failure and the body is an Array' do
+      let(:parsed_body) do
         [{ 'Code' => 123, 'Message' => 'MerchantOrderId cannot be null' }]
-      }
+      end
 
       let(:response) { double(success?: false, parsed_body: parsed_body) }
 
       it 'returns false and fills the errors attribute' do
         expect(splitted_payment.split([split1, split2])).to be_falsey
-        expect(splitted_payment.errors).to eq([{ code: 123, message: "MerchantOrderId cannot be null" }])
+        expect(splitted_payment.errors).to eq([{ code: 123, message: 'MerchantOrderId cannot be null' }])
+      end
+    end
+
+    context 'when the gateway returns a failure and the body is a Hash' do
+      let(:parsed_body) do
+        {
+          'Errors' => [
+            {
+              'Message' => 'No one value can be negative'
+            }
+          ]
+        }
+      end
+
+      let(:response) { double(success?: false, parsed_body: parsed_body) }
+
+      it 'returns false and fills the errors attribute' do
+        expect(splitted_payment.split([split1, split2])).to be_falsey
+        expect(splitted_payment.errors).to eq([{ code: nil, message: 'No one value can be negative' }])
       end
     end
   end

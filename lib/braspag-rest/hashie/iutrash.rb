@@ -32,7 +32,11 @@ module Hashie
     end
 
     def initialize_errors(errors)
-      @errors = errors.map { |error| { code: error['Code'], message: error['Message'] } }
+      if errors.is_a? [].class
+        @errors = errors.map { |error| { code: error['Code'], message: error['Message'] } }
+      else
+        @errors = errors['Errors'].map { |error| { code: error['Code'], message: error['Message'] } }
+      end
     end
   end
 end
