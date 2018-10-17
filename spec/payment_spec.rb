@@ -22,6 +22,7 @@ describe BraspagRest::Payment do
           'Method' => 'PUT'
         }
       ],
+      'Tid' => '1016101051753',
       'ServiceTaxAmount' => 0,
       'Country' => 'BRA',
       'AcquirerTransactionId' => '0625101832104',
@@ -79,6 +80,7 @@ describe BraspagRest::Payment do
       'ServiceTaxAmount' => 0,
       'Country' => 'BRA',
       'AcquirerTransactionId' => '0625101832104',
+      'Tid' => '1016101051753',
       'CreditCard' => {
         'ExpirationDate' => '12/2021',
         'SaveCard' => false,
@@ -245,6 +247,7 @@ describe BraspagRest::Payment do
       expect(payment.authorization_code).to eq('058475')
       expect(payment.reason_code).to eq(0)
       expect(payment.reason_message).to eq('Successful')
+      expect(payment.tid).to eq('1016101051753')
     end
   end
 
@@ -282,6 +285,8 @@ describe BraspagRest::Payment do
       expect(payment_splitted.split_payments[1].splits[0].amount).to eq(3890)
       expect(payment_splitted.split_payments[1].splits[1].merchant_id).to eq('abf26594-b758-4a69-841d-e254285f7068')
       expect(payment_splitted.split_payments[1].splits[1].amount).to eq(110)
+      expect(payment_splitted.tid).to eq('1016101051753')
+
     end
   end
 
