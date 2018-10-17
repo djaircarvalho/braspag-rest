@@ -23,6 +23,7 @@ module BraspagRest
     property :reason_message, from: 'ReasonMessage'
     property :voided_amount, from: 'VoidedAmount'
     property :voided_date, from: 'VoidedDate'
+    property :tid, from: 'Tid'
 
     property :split_payments, from: 'SplitPayments'
     property :refunds, from: 'Refunds'
