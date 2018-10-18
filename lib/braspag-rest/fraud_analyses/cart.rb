@@ -7,7 +7,7 @@ module BraspagRest
       property :returns_accepted, from: 'ReturnsAccepted'
       property :items, from: 'Items'
 
-      coerce_key :items, Array[Item]
+      coerce_key :items, Array[BraspagRest::FraudAnalyses::Item]
     end
   end
 end
