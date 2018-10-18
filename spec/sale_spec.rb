@@ -72,13 +72,48 @@ describe BraspagRest::Sale do
       {
         order_id: 123456,
         customer: {
-          name: 'Maria'
+          name: 'Maria',
+          identity: '790.010.515-88',
+          identity_type: 'CPF',
+          email: 'teste@teste.com.br',
+          ip_address: '200.200.0.0',
+          address: {
+            street: 'Alameda Xingu',
+            number: '512',
+            complement: '27 andar',
+            zip_code: '12345987',
+            city: 'São Paulo',
+            state: 'SP',
+            country: 'BRA',
+            district: 'Alphaville'
+          },
+          delivery_address: {
+            street: 'Alameda Xingu',
+            number: '512',
+            complement: '27 andar',
+            zip_code: '12345987',
+            city: 'São Paulo',
+            state: 'SP',
+            country: 'BRA',
+            district: 'Alphaville'
+          },
+          billing_address: {
+            street: 'Alameda Xingu',
+            number: '512',
+            complement: '27 andar',
+            zip_code: '12345987',
+            city: 'São Paulo',
+            state: 'SP',
+            country: 'BRA',
+            district: 'Alphaville'
+          }
         },
         payment: {
           type: 'CreditCard',
           amount: 15700,
           provider: 'Simulado',
           installments: 1,
+          soft_descriptor: 'MarketPlace Bonitour',
           credit_card: {
             number: '0000000000000001',
             holder: 'Maria',
@@ -102,6 +137,17 @@ describe BraspagRest::Sale do
       let(:response) { double(success?: true, parsed_body: parsed_body) }
 
       it 'returns true and fills the sale object with the return' do
+        expect(sale.payment.soft_descriptor).to_not be_nil
+        expect(sale.customer.identity).to_not be_nil
+        expect(sale.customer.identity_type).to_not be_nil
+        expect(sale.customer.email).to_not be_nil
+        expect(sale.customer.ip_address).to_not be_nil
+        expect(sale.customer).to be_an_instance_of(BraspagRest::Customer)
+        expect(sale.payment).to be_an_instance_of(BraspagRest::Payment)
+        expect(sale.customer.address).to be_an_instance_of(BraspagRest::Address)
+        expect(sale.customer.delivery_address).to be_an_instance_of(BraspagRest::Address)
+        expect(sale.customer.billing_address).to be_an_instance_of(BraspagRest::Address)
+        expect(sale.payment.credit_card).to be_an_instance_of(BraspagRest::CreditCard)
         expect(sale.save).to be_truthy
         expect(sale.payment.status).to eq(1)
         expect(sale.payment.id).to eq('1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1')
