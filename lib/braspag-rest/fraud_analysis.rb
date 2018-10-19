@@ -18,6 +18,11 @@ module BraspagRest
     property :status, from: 'Status'
     property :fraud_analysis_reason_code, from: 'FraudAnalysisReasonCode'
 
+    property :status_description, from: 'StatusDescription'
+    property :total_order_amount, from: 'TotalOrderAmount'
+    property :transaction_amount, from: 'TransactionAmount'
+    property :is_retry_transaction, from: 'IsRetryTransaction'
+
     # Response
     property :id, from: 'Id'
 
