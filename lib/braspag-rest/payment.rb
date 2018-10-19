@@ -54,11 +54,17 @@ module BraspagRest
     property :is_splitted, from: 'IsSplitted'
     property :return_message, from: 'ReturnMessage'
     property :return_code, from: 'ReturnCode'
+    
+    property :voids, from: 'Voids'
+    # property :charge_backs, from: 'Chargebacks'
 
     coerce_key :fraud_analysis, BraspagRest::FraudAnalysis
     coerce_key :credit_card, BraspagRest::CreditCard
     coerce_key :refunds, Array[BraspagRest::Refund]
     coerce_key :split_payments, Array[BraspagRest::SplitPayment]
+
+    coerce_key :voids, Array[BraspagRest::Void]
+    # coerce_key :charge_backs, Array[BraspagRest::Chargeback]
 
     def split(splits)
       raise BraspagRest::NotSplittablePaymentError unless splitted?
