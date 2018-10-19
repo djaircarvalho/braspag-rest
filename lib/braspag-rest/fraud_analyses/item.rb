@@ -20,6 +20,9 @@ module BraspagRest
       property :merchant_item_id, from: 'MerchantItemId'
       property :original_price, from: 'OriginalPrice'
       property :description, from: 'Description'
+
+      property :weight, from: 'Weight'
+      property :cart_type, from: 'CartType'
     end
   end
 end
