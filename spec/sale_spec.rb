@@ -128,7 +128,14 @@ describe BraspagRest::Sale do
               browser_finger_print: 'browser_finger_print_token'
             },
             cart:{
-              items: []
+              items: [{
+                name: 'Item teste',
+                merchant_item_id: '123',
+                quantity: 1,
+                unit_price: 1000,
+                original_price: 1000,
+                description: 'Descricao item teste'
+                }]
             }
           }
         }
@@ -153,11 +160,9 @@ describe BraspagRest::Sale do
         expect(sale.customer.ip_address).to_not be_nil
 
         expect(sale.payment.soft_descriptor).to_not be_nil
-        expect(sale.payment.fraud_analysis).to_not be_nil
         expect(sale.payment.fraud_analysis.browser.ip_address).to_not be_nil
         expect(sale.payment.fraud_analysis.browser.browser_finger_print).to_not be_nil
-        expect(sale.payment.fraud_analysis.cart).to_not be_nil
-        expect(sale.payment.fraud_analysis.cart.items).to_not be_nil
+        expect(sale.payment.fraud_analysis.cart.items).to_not be_empty
 
         expect(sale.customer).to be_an_instance_of(BraspagRest::Customer)
         expect(sale.payment).to be_an_instance_of(BraspagRest::Payment)
@@ -165,6 +170,7 @@ describe BraspagRest::Sale do
         expect(sale.payment.fraud_analysis.browser).to be_an_instance_of(BraspagRest::FraudAnalyses::Browser)
         expect(sale.payment.fraud_analysis.cart).to be_an_instance_of(BraspagRest::FraudAnalyses::Cart)
         expect(sale.payment.fraud_analysis.cart.items).to be_an_instance_of(Array)
+        expect(sale.payment.fraud_analysis.cart.items.first).to be_an_instance_of(BraspagRest::FraudAnalyses::Item)
         expect(sale.customer.address).to be_an_instance_of(BraspagRest::Address)
         expect(sale.customer.delivery_address).to be_an_instance_of(BraspagRest::Address)
         expect(sale.customer.billing_address).to be_an_instance_of(BraspagRest::Address)
