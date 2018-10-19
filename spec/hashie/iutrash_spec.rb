@@ -45,10 +45,10 @@ describe Hashie::IUTrash do
       expect(person.inverse_attributes).to eq(params)
     end
 
-    it 'nested inverse attributes' do
+    it 'array nested inverse attributes' do
       params['Telephones'] = [
-        { code: '+55', number: '555-555' },
-        { code: '+1', number: '222-222' }
+        { "Code" => '+55', "Number" => '555-555' },
+        { "Code" => '+1', "Number" => '222-222' }
       ]
       person = Person.new(params)
 
