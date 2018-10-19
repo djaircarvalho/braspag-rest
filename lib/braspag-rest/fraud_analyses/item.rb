@@ -17,9 +17,10 @@ module BraspagRest
       property :time_hedge, from: 'TimeHedge'
       property :type, from: 'Type'
       property :velocity_hedge, from: 'VelocityHedge'
-      property :passenger, from: 'Passenger'
 
-      coerce_key :passenger, BraspagRest::FraudAnalyses::Passenger
+      property :merchant_item_id, from: 'MerchantItemId'
+      property :original_price, from: 'OriginalPrice'
+      property :description, from: 'Description'
     end
   end
 end

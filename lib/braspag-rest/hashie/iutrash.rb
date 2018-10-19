@@ -20,7 +20,7 @@ module Hashie
     private
 
     def nested_inverse(value)
-      if [Array, Set].include?(value.class)
+      if [[].class, Array, Set].include?(value.class)
         value.map { |item| attributes_for(item) }
       else
         attributes_for(value)

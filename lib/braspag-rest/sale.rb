@@ -34,7 +34,7 @@ module BraspagRest
         initialize_errors(response.parsed_body) and return false
       end
 
-      true
+      payment.authorized?
     end
 
     def cancel(amount = nil)

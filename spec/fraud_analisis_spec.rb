@@ -8,12 +8,14 @@ describe BraspagRest::FraudAnalysis do
       'SequenceCriteria' => 'Always',
       'CaptureOnLowRisk' => false,
       'VoidOnHighRisk' => false,
+      'Provider' => 'ReDShield',
       'Browser' => {
         'CookiesAccepted' => false,
         'Email' => 'compradorteste@live.com',
         'HostName' => 'Teste',
         'IpAddress' => '202.190.150.350',
-        'Type' => 'Chrome'
+        'Type' => 'Chrome',
+        'BrowserFingerPrint' => 'browser_finger_print_token'
       },
       'Cart' => {
         'IsGift' => false,
@@ -53,6 +55,7 @@ describe BraspagRest::FraudAnalysis do
       expect(fraud_analysis.sequence).to eq('AuthorizeFirst')
       expect(fraud_analysis.sequence_criteria).to eq('Always')
       expect(fraud_analysis.void_on_high_risk).to eq(false)
+      expect(fraud_analysis.provider).to eq('ReDShield')
 
       expect(fraud_analysis.merchant_defined_fields.first.id).to eq(9)
       expect(fraud_analysis.merchant_defined_fields.first.value).to eq('web')
@@ -62,6 +65,7 @@ describe BraspagRest::FraudAnalysis do
       expect(fraud_analysis.browser.host_name).to eq('Teste')
       expect(fraud_analysis.browser.ip_address).to eq('202.190.150.350')
       expect(fraud_analysis.browser.type).to eq('Chrome')
+      expect(fraud_analysis.browser.browser_finger_print).to eq('browser_finger_print_token')
 
       expect(fraud_analysis.cart.is_gift).to eq(false)
       expect(fraud_analysis.cart.returns_accepted).to eq(true)

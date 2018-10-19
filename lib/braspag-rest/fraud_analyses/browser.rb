@@ -7,6 +7,7 @@ module BraspagRest
       property :host_name, from: 'HostName'
       property :ip_address, from: 'IpAddress'
       property :type, from: 'Type'
+      property :browser_finger_print, from: 'BrowserFingerPrint'
     end
   end
 end

@@ -14,24 +14,16 @@ module BraspagRest
     property :browser, from: 'Browser'
     property :cart, from: 'Cart'
     property :merchant_defined_fields, from: 'MerchantDefinedFields'
-
-    property :shipping, from: 'Shipping'
-    property :travel, from: 'Travel'
+    property :provider, from: 'Provider'
 
     property :status, from: 'Status'
     property :fraud_analysis_reason_code, from: 'FraudAnalysisReasonCode'
 
     # Response
-    property :travel, from: 'Travel'
-    property :shipping, from: 'Shipping'
     property :id, from: 'Id'
-    property :reply_data, from: 'ReplyData'
 
     coerce_key :browser, BraspagRest::FraudAnalyses::Browser
     coerce_key :cart, BraspagRest::FraudAnalyses::Cart
-    coerce_key :shipping, BraspagRest::FraudAnalyses::Shipping
-    coerce_key :travel, BraspagRest::FraudAnalyses::Travel
-    coerce_key :reply_data, BraspagRest::FraudAnalyses::ReplyData
     coerce_key :merchant_defined_fields, Array[BraspagRest::FraudAnalyses::MerchantDefinedFields]
 
     def accepted?
