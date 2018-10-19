@@ -50,10 +50,16 @@ module BraspagRest
     property :provider_return_message, from: 'ProviderReturnMessage'
     property :links, from: 'Links'
 
+    property :voids, from: 'Voids'
+    # property :charge_backs, from: 'Chargebacks'
+
     coerce_key :fraud_analysis, BraspagRest::FraudAnalysis
     coerce_key :credit_card, BraspagRest::CreditCard
     coerce_key :refunds, Array[BraspagRest::Refund]
     coerce_key :split_payments, Array[BraspagRest::SplitPayment]
+
+    coerce_key :voids, Array[BraspagRest::Void]
+    # coerce_key :charge_backs, Array[BraspagRest::Chargeback]
 
     def split(splits)
       raise BraspagRest::NotSplittablePaymentError unless splitted?
