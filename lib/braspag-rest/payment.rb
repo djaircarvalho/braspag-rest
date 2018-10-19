@@ -50,6 +50,11 @@ module BraspagRest
     property :provider_return_message, from: 'ProviderReturnMessage'
     property :links, from: 'Links'
 
+    property :recurrent, from: 'Recurrent'
+    property :is_splitted, from: 'IsSplitted'
+    property :return_message, from: 'ReturnMessage'
+    property :return_code, from: 'ReturnCode'
+
     coerce_key :fraud_analysis, BraspagRest::FraudAnalysis
     coerce_key :credit_card, BraspagRest::CreditCard
     coerce_key :refunds, Array[BraspagRest::Refund]
@@ -62,7 +67,7 @@ module BraspagRest
       response = BraspagRest::Request.split(id, splits)
 
       if response.success?
-        initialize_attributes(response.parsed_body)
+        initialize_attributes(self.inverse_attributes.merge(response.parsed_body))
       else
         initialize_errors(response.parsed_body) and return false
       end
