@@ -54,7 +54,7 @@ module BraspagRest
     property :is_splitted, from: 'IsSplitted'
     property :return_message, from: 'ReturnMessage'
     property :return_code, from: 'ReturnCode'
-    
+
     property :voids, from: 'Voids'
     # property :charge_backs, from: 'Chargebacks'
 
