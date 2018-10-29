@@ -332,6 +332,68 @@ describe BraspagRest::Sale do
     end
   end
 
+  describe '#capture_with_split' do
+    subject(:sale) { BraspagRest::Sale.new(request_id: 'xxx-xxx-xxx', payment: { id: 2018102912000001, amount: 10000 }) }
+    let(:splits) {
+      [
+        {
+            'SubordinateMerchantId' => 'a4133798-9fac-4592-b040-d62d8239bd97',
+            'Amount' => 5000,
+            'Fares' => {
+                'Mdr' => 5,
+                'Fee' => 30
+            }
+        },
+        {
+            'SubordinateMerchantId' => '20943d1a-153f-42b6-93b8-07b9db000651',
+            'Amount' => 5000,
+            'Fares' => {
+                'Mdr' => 4,
+                'Fee' => 15
+            }
+        }
+      ]
+    }
+
+    it 'calls braspag gateway with request_id, payment_id and payment amount' do
+      expect(BraspagRest::Request).to receive(:capture_with_split).with('xxx-xxx-xxx', 2018102912000001, splits).and_return(double(success?: true, parsed_body: {}))
+
+      sale.capture_with_split(splits)
+    end
+
+    context 'when the gateway returns a successful response' do
+      let(:parsed_body) {
+        { 'Status' => 2 }
+      }
+
+      let(:response) { double(success?: true, parsed_body: parsed_body) }
+
+      before { allow(BraspagRest::Request).to receive(:capture_with_split).and_return(response) }
+
+      it 'returns true and fills the sale object with the return' do
+        expect(sale.capture_with_split(splits)).to be_truthy
+        expect(sale.payment.status).to eq(2)
+        expect(sale.payment.id).to eq(2018102912000001)
+        expect(sale.payment.amount).to eq(10000)
+      end
+    end
+
+    context 'when the gateway returns a failure' do
+      let(:parsed_body) {
+        [{ 'Code' => 123, 'Message' => 'Amount cannot be null' }]
+      }
+
+      let(:response) { double(success?: false, parsed_body: parsed_body) }
+
+      before { allow(BraspagRest::Request).to receive(:capture_with_split).and_return(response) }
+
+      it 'returns false and fills the errors attribute' do
+        expect(sale.capture_with_split(splits)).to be_falsey
+        expect(sale.errors).to eq([{ code: 123, message: "Amount cannot be null" }])
+      end
+    end
+  end
+
   describe '.find' do
     before { allow(BraspagRest::Request).to receive(:get_sale).and_return(double(parsed_body: braspag_response)) }
 
