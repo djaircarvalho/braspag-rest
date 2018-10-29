@@ -61,6 +61,18 @@ module BraspagRest
       payment.captured?
     end
 
+    def capture_with_split(splits)
+      response = BraspagRest::Request.capture_with_split(request_id, payment.id, splits)
+
+      if response.success?
+        self.payment.initialize_attributes(response.parsed_body)
+      else
+        initialize_errors(response.parsed_body) and return false
+      end
+
+      payment.captured?
+    end
+
     def reload
       if !request_id.nil? && payment && !payment.id.nil?
         reloaded_reference = self.class.find(request_id, payment.id)
