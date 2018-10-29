@@ -86,6 +86,20 @@ module BraspagRest
         end
       end
 
+      def void2(request_id, payment_id, amount, voids)
+        config.logger.info("[BraspagRest][Void] endpoint: #{void_url(payment_id, amount)}") if config.log_enabled?
+
+        execute_braspag_request do
+          RestClient::Request.execute(
+            method: :put,
+            url: void_url(payment_id, amount),
+            payload: voids.map { |void| void.inverse_attributes }.to_json,
+            headers: default_headers.merge('RequestId' => request_id),
+            timeout: config.request_timeout
+          )
+        end
+      end
+
       private
 
       def execute_braspag_request(&block)

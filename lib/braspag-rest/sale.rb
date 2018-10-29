@@ -47,6 +47,18 @@ module BraspagRest
       response.success?
     end
 
+    def cancel2(amount = nil, voids = nil)
+      response = BraspagRest::Request.void2(request_id, payment.id, amount, voids)
+
+      if response.success?
+        reload
+      else
+        initialize_errors(response.parsed_body)
+      end
+
+      response.success?
+    end
+
     def reload
       if !request_id.nil? && payment && !payment.id.nil?
         reloaded_reference = self.class.find(request_id, payment.id)
