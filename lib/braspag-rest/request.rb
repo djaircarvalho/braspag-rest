@@ -73,6 +73,20 @@ module BraspagRest
         end
       end
 
+      def capture_with_split(request_id, payment_id, splits)
+        config.logger.info("[BraspagRest][Capture] endpoint: #{capture_url(payment_id)}, splits: #{splits}") if config.log_enabled?
+
+        execute_braspag_request do
+          RestClient::Request.execute(
+            method: :put,
+            url: capture_url(payment_id),
+            payload: { SplitPayments: splits.map { |split| split.inverse_attributes } }.to_json,
+            headers: default_headers.merge('RequestId' => request_id),
+            timeout: config.request_timeout
+          )
+        end
+      end
+
       def split(payment_id, splits)
         config.logger.info("[BraspagRest][Split] endpoint: #{split_url(payment_id)}, splits: #{splits}") if config.log_enabled?
 
