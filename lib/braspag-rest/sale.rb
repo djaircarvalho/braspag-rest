@@ -81,9 +81,5 @@ module BraspagRest
 
       self
     end
-
-    def splitted?
-      payment.splitted?
-    end
   end
 end
