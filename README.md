@@ -103,31 +103,47 @@ sale.save
 
 ```rb
 sale = BraspagRest::Sale.new(
-  order_id: '123456',
-  request_id: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+  order_id: '2018103013240001',
+  request_id: '4e64d4ec-c0a7-4156-82b0-f010b59c18d7',
   customer: {
-    name: 'Comprador Teste'
+    name: 'Comprador Accept',
+    identity: '12345678901',
+    identity_type: 'CPF',
+    email: 'teste@teste.com.br',
+    address: {
+      street: 'Av teste',
+      number: '147',
+      complement: 'Andar 2',
+      zip_code: '88088080',
+      city: 'Florianopolis',
+      state: 'SC',
+      country: 'BRA',
+      district: 'AlphaBeta'
+    }
   },
   payment: {
-    type: 'CreditCard',
+    type: 'SplittedCreditCard',
     amount: 15700,
     provider: 'Simulado',
     installments: 1,
+    soft_descriptor: 'MarketPlace',
     credit_card: {
-      number: '0000000000000001',
-      holder: 'Teste Holder',
-      expiration_date: '12/2021',
-      security_code: '123',
+      number: '4017809929547484',
+      holder: 'Tristan Carter',
+      expiration_date: '09/2022',
+      security_code: '608',
       brand: 'Visa'
-    }
+    },
     fraud_analysis: {
       sequence: 'AuthorizeFirst',
       sequence_criteria: 'Always',
       capture_on_low_risk: false,
       void_on_high_risk: false,
+      provider: 'Cybersource',
+      finger_print_id: '074c1ee676ed4998ab66491013c565e2',
       browser: {
         cookies_accepted: false,
-        email: 'compradorteste@live.com',
+        email: 'teste@teste.com.br',
         host_name: 'Teste',
         ip_address: '202.190.150.350',
         type: 'Chrome'
@@ -145,7 +161,7 @@ sale = BraspagRest::Sale.new(
             name: 'ItemTeste',
             quantity: 1,
             sku: '201411170235134521346',
-            unit_price: 123,
+            unit_price: 15700,
             risk: 'High',
             time_hedge: 'Normal',
             type: 'AdultContent',
@@ -158,21 +174,7 @@ sale = BraspagRest::Sale.new(
           id: 9,
           value: 'web'
         }
-      ],
-      shipping: {
-        addressee: 'Sr Comprador Teste',
-        method: 'LowCost',
-        phone: '21114740'
-      },
-      travel: {
-        departure_time: '2010-01-02',
-        journey_type: 'Ida',
-        route: 'MAO-RJO',
-        legs: [{
-          destination: 'GYN',
-          origin: 'VCP'
-        }]
-      }
+      ]
     }
   }
 )
