@@ -35,25 +35,15 @@ module BraspagRest
       payment.captured?
     end
 
-    def cancel(amount = nil)
-      response = BraspagRest::Request.void(request_id, payment.id, amount)
+    def cancel(amount = nil, voids = nil)
+      raise BraspagRest::NoVoidsGiven if amount && !voids
+      
+      response = BraspagRest::Request.void(request_id, payment.id, amount, voids)
 
       if response.success?
         reload
       else
-        initialize_errors(response.parsed_body)
-      end
-
-      response.success?
-    end
-
-    def cancel2(amount = nil, voids = nil)
-      response = BraspagRest::Request.void2(request_id, payment.id, amount, voids)
-
-      if response.success?
-        reload
-      else
-        initialize_errors(response.parsed_body)
+        initialize_errors(response.parsed_body) and return false
       end
 
       response.success?

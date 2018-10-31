@@ -5,9 +5,9 @@ module BraspagRest
     property :id, from: 'Id'
     property :amount, from: 'Amount'
     property :date, from: 'Date'
-    property :voided_split_payments, from: 'VoidedSplitPayments'
+    property :void_split_payments, from: 'VoidSplitPayments'
 
-    coerce_key :voided_split_payments, Array[BraspagRest::VoidedSplitPayment]
+    coerce_key :void_split_payments, Array[BraspagRest::VoidSplitPayment]
 
   end
 end
