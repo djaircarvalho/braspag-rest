@@ -12,24 +12,11 @@ module BraspagRest
     coerce_key :customer, BraspagRest::Customer
     coerce_key :payment, BraspagRest::Payment
 
-    def self.find(request_id, payment_id)
-      response = BraspagRest::Request.get_sale(request_id, payment_id)
-
-      new(response.parsed_body.merge('RequestId' => request_id))
-    end
-
-    def self.find_by_order_id(request_id, order_id)
-      response = BraspagRest::Request.get_sales_for_merchant_order_id(request_id, order_id)
-      payments = response.parsed_body['Payments']
-
-      Array(payments).map { |payment| BraspagRest::Sale.find(request_id, payment['PaymentId']) }
-    end
-
     def save
       response = BraspagRest::Request.authorize(request_id, inverse_attributes)
 
       if response.success?
-        initialize_attributes(response.parsed_body)
+        initialize_attributes(self.inverse_attributes.merge(response.parsed_body))
       else
         initialize_errors(response.parsed_body) and return false
       end
@@ -37,28 +24,30 @@ module BraspagRest
       payment.authorized?
     end
 
-    def cancel(amount = nil)
-      response = BraspagRest::Request.void(request_id, payment.id, amount)
-
-      if response.success?
-        reload
-      else
-        initialize_errors(response.parsed_body)
-      end
-
-      response.success?
-    end
-
     def capture(amount = nil)
       response = BraspagRest::Request.capture(request_id, payment.id, (amount || payment.amount))
 
       if response.success?
-        self.payment.initialize_attributes(response.parsed_body)
+        self.payment.initialize_attributes(self.payment.inverse_attributes.merge(response.parsed_body))
       else
         initialize_errors(response.parsed_body) and return false
       end
 
       payment.captured?
+    end
+
+    def cancel(amount = nil, voids = nil)
+      raise BraspagRest::NoVoidsGiven if amount && !voids
+      
+      response = BraspagRest::Request.void(request_id, payment.id, amount, voids)
+
+      if response.success?
+        reload
+      else
+        initialize_errors(response.parsed_body) and return false
+      end
+
+      response.success?
     end
 
     def capture_with_split(splits)
@@ -80,6 +69,19 @@ module BraspagRest
       end
 
       self
+    end
+
+    def self.find(request_id, payment_id)
+      response = BraspagRest::Request.get_sale(request_id, payment_id)
+
+      new(response.parsed_body.merge('RequestId' => request_id))
+    end
+
+    def self.find_by_order_id(request_id, order_id)
+      response = BraspagRest::Request.get_sales_for_merchant_order_id(request_id, order_id)
+      payments = response.parsed_body['Payments']
+
+      Array(payments).map { |payment| BraspagRest::Sale.find(request_id, payment['PaymentId']) }
     end
 
     def splitted?

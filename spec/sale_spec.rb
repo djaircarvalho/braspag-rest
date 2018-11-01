@@ -58,6 +58,147 @@ describe BraspagRest::Sale do
     }
   }
 
+  let(:splitted_credit_card_payment_captured) {
+    {
+      'Payment' => {
+        'ReasonMessage' => 'Successful',
+        'Interest' => 'ByMerchant',
+        'Links' => [
+          {
+            'Href' => 'https=>//apiqueryhomolog.braspag.com.br/v2/sales/1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1',
+            'Method' => 'GET',
+            'Rel' => 'self'
+          },
+          {
+            'Method' => 'PUT',
+            'Href' => 'https=>//apihomolog.braspag.com.br/v2/sales/1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1/capture',
+            'Rel' => 'capture'
+          },
+          {
+            'Rel' => 'void',
+            'Href' => 'https=>//apihomolog.braspag.com.br/v2/sales/1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1/void',
+            'Method' => 'PUT'
+          }
+        ],
+        'ServiceTaxAmount' => 0,
+        'Country' => 'BRA',
+        'AcquirerTransactionId' => '0625101832104',
+        'Tid' => '1016101051753',
+        'CreditCard' => {
+          'ExpirationDate' => '12/2021',
+          'SaveCard' => false,
+          'Brand' => 'Visa',
+          'CardNumber' => '000000******0001',
+          'Holder' => 'Teste Holder'
+        },
+        'ReceivedDate' => '2015-06-25 10:18:32',
+        'ProviderReturnCode' => '4',
+        'ReasonCode' => 0,
+        'ProofOfSale' => '1832104',
+        'Capture' => false,
+        'Provider' => 'Simulado',
+        'Currency' => 'BRL',
+        'ProviderReturnMessage' => 'Operation Successful',
+        'Amount' => 10000,
+        'BoletoNumber' => '2017091101',
+        'CapturedAmount' => 10000,
+        'Type' => 'SplittedCreditCard',
+        'AuthorizationCode' => '058475',
+        'PaymentId' => '1ff114b4-32bb-4fe2-b1f2-ef79822ad5e1',
+        'Authenticate' => false,
+        'Installments' => 1,
+        'Recurrent' => false,
+        'VoidedAmount' => 5000,
+        'VoidedDate' => '2015-06-28 10:18:32',
+        'Status' => 2,
+        'SplitPayments' => [
+          {
+            'SubordinateMerchantId' => '20943d1a-153f-42b6-93b8-07b9db000651',
+            'Amount' => 6000,
+            'Fares' => {
+              'Mdr' => 2,
+              'Fee' => 30
+            },
+            'Splits' => [
+              {
+                'MerchantId' => '20943d1a-153f-42b6-93b8-07b9db000651',
+                'Amount' => 5850
+              },
+              {
+                'MerchantId' => 'abf26594-b758-4a69-841d-e254285f7068',
+                'Amount' => 150
+              }
+            ]
+          },
+          {
+            'SubordinateMerchantId' => 'a4133798-9fac-4592-b040-d62d8239bd97',
+            'Amount' => 4000,
+            'Fares' => {
+              'Mdr' => 2,
+              'Fee' => 30
+            },
+            'Splits' => [
+              {
+                'MerchantId' => 'a4133798-9fac-4592-b040-d62d8239bd97',
+                'Amount' => 3890
+              },
+              {
+                'MerchantId' => 'abf26594-b758-4a69-841d-e254285f7068',
+                'Amount' => 110
+              }
+            ]
+          }
+        ],
+        'Voids' => [
+          {
+            'Id' => 'xxx',
+            'Amount' => 3000,
+            'VoidedSplitPayments' => [
+              {
+                'SubordinateMerchantId' => '20943d1a-153f-42b6-93b8-07b9db000651',
+                'VoidedAmount' => 3000,
+                'VoidedSplits' => [
+                  {
+                    'MerchantId' => '20943d1a-153f-42b6-93b8-07b9db000651',
+                    'VoidedAmount' => 2925
+                  },
+                  {
+                    'MerchantId' => 'abf26594-b758-4a69-841d-e254285f7068',
+                    'VoidedAmount' => 75
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            'Id' => 'xxx1',
+            'Amount' => 2000,
+            'VoidedSplitPayments' => [
+              {
+                'SubordinateMerchantId' => 'a4133798-9fac-4592-b040-d62d8239bd97',
+                'VoidedAmount' => 2000,
+                'VoidedSplits' => [
+                  {
+                    'MerchantId' => 'a4133798-9fac-4592-b040-d62d8239bd97',
+                    'VoidedAmount' => 1950
+                  },
+                  {
+                    'MerchantId' => '20943d1a-153f-42b6-93b8-07b9db000651',
+                    'VoidedAmount' => 50
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      'MerchantOrderId' => '18288',
+      'Customer' => {
+         'Name' => 'Comprador Teste'
+      }
+    }
+  }
+
   describe '.new' do
     subject(:sale) { BraspagRest::Sale.new(braspag_response) }
 
@@ -198,30 +339,39 @@ describe BraspagRest::Sale do
   end
 
   describe '#cancel' do
-    subject(:sale) { BraspagRest::Sale.new(request_id: 'xxx-xxx-xxx', payment: { id: 123, amount: 1000 }) }
+    subject(:sale) { BraspagRest::Sale.new(request_id: 'xxx-xxx-xxx', payment: { id: 123, amount: 10000 }) }
+    let(:void1) do
+      BraspagRest::VoidSplitPayment.new(subordinate_merchant_id: 'a4133798-9fac-4592-b040-d62d8239bd97', voided_amount: 2000)
+    end
+    let(:void2) do
+      BraspagRest::VoidSplitPayment.new(subordinate_merchant_id: '20943d1a-153f-42b6-93b8-07b9db000651', voided_amount: 3000)
+    end
+    let(:voids) do
+      BraspagRest::Void.new(void_split_payments: [void1, void2])
+    end
 
-    context "when no amount is given" do
-      let(:voided_sale_braspag_response) do
+    context "when no amount and no voids are given" do
+      let(:full_voided_sale_braspag_response) do
         braspag_response['Payment']['VoidedAmount'] = sale.payment.amount
         braspag_response['Payment']['VoidedDate'] = '2015-06-27 10:18:32'
         braspag_response
       end
 
       before do
-        allow(BraspagRest::Request).to receive(:void).with('xxx-xxx-xxx', 123, nil)
+        allow(BraspagRest::Request).to receive(:void).with('xxx-xxx-xxx', 123, nil, nil)
           .and_return(double(success?: true, parsed_body: {}))
 
-        allow(BraspagRest::Request).to receive(:get_sale).and_return(double(parsed_body: voided_sale_braspag_response))
+        allow(BraspagRest::Request).to receive(:get_sale).and_return(double(parsed_body: full_voided_sale_braspag_response))
       end
 
-      it 'calls braspag gateway with request_id, payment_id and no payment amount' do
-        expect(BraspagRest::Request).to receive(:void).with('xxx-xxx-xxx', 123, nil).and_return(double(success?: true, parsed_body: {}))
+      it 'calls braspag gateway with request_id, payment_id and no payment amount and voids' do
+        expect(BraspagRest::Request).to receive(:void).with('xxx-xxx-xxx', 123, nil, nil).and_return(double(success?: true, parsed_body: {}))
         sale.cancel
       end
 
       it "updates the sale's voided amount with the full transaction amount" do
         sale.cancel
-        expect(sale.payment.voided_amount).to eq(1000)
+        expect(sale.payment.voided_amount).to eq(10000)
       end
 
       it "updates the sale's voided date" do
@@ -234,37 +384,37 @@ describe BraspagRest::Sale do
       end
     end
 
-    context "when an amount is given" do
-      let(:voided_sale_braspag_response) do
-        braspag_response['Payment']['VoidedAmount'] = 500
-        braspag_response['Payment']['VoidedDate'] = '2015-06-28 10:18:32'
-        braspag_response
+    context 'when amount is given but no voids are given' do
+      it 'raises BraspagRest::NoVoidsGiven' do
+        expect { sale.cancel(5000) }.to raise_error(BraspagRest::NoVoidsGiven)
       end
+    end
 
+    context "when an amount and voids are given" do
       before do
-        allow(BraspagRest::Request).to receive(:void).with('xxx-xxx-xxx', 123, 500)
+        allow(BraspagRest::Request).to receive(:void).with('xxx-xxx-xxx', 123, 5000, voids)
           .and_return(double(success?: true, parsed_body: {}))
 
-        allow(BraspagRest::Request).to receive(:get_sale).and_return(double(parsed_body: voided_sale_braspag_response))
+        allow(BraspagRest::Request).to receive(:get_sale).and_return(double(parsed_body: splitted_credit_card_payment_captured))
       end
 
-      it 'calls braspag gateway with request_id, payment_id and amount parameter' do
-        expect(BraspagRest::Request).to receive(:void).with('xxx-xxx-xxx', 123, 500).and_return(double(success?: true, parsed_body: {}))
-        sale.cancel(500)
+      it 'calls braspag gateway with request_id, payment_id, amount and voids parameter' do
+        expect(BraspagRest::Request).to receive(:void).with('xxx-xxx-xxx', 123, 5000, voids).and_return(double(success?: true, parsed_body: {}))
+        sale.cancel(5000, voids)
       end
 
       it "updates the sale's voided amount with the requested refund amount" do
-        sale.cancel(500)
-        expect(sale.payment.voided_amount).to eq(500)
+        sale.cancel(5000, voids)
+        expect(sale.payment.voided_amount).to eq(5000)
       end
 
       it "updates the sale's voided date" do
-        sale.cancel(500)
+        sale.cancel(5000, voids)
         expect(sale.payment.voided_date).to eq('2015-06-28 10:18:32')
       end
 
       it "reports success" do
-        expect(sale.cancel(500)).to be_truthy
+        expect(sale.cancel(5000, voids)).to be_truthy
       end
     end
 
