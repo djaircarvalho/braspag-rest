@@ -93,18 +93,26 @@ describe BraspagRest::Request do
     let(:payment_id) { '123456' }
     let(:request_id) { '30000000-0000-0000-0000-000000000001' }
     let(:amount) { nil }
-
+    let(:void1) do
+      BraspagRest::VoidSplitPayment.new(subordinate_merchant_id: 'a4133798-9fac-4592-b040-d62d8239bd97', voided_amount: 2000)
+    end
+    let(:void2) do
+      BraspagRest::VoidSplitPayment.new(subordinate_merchant_id: '20943d1a-153f-42b6-93b8-07b9db000651', voided_amount: 3000)
+    end
+    let(:voids) do
+      BraspagRest::Void.new(void_split_payments: [void1, void2])
+    end
     let(:headers) do
       {
         'Accept' => 'application/json',
         'Content-Type' => 'application/json',
-        'RequestId' => request_id,
         'Authorization' => BraspagRest::TokenManager.token
       }
     end
 
     context 'when no amount is given' do
       let(:void_url) { config['url'] + '/1/sales/' + payment_id + '/void' }
+      let(:voids) { nil }
 
       it 'does not specify an amount to be voided' do
         expect(RestClient::Request).to receive(:execute).with(
@@ -113,11 +121,11 @@ describe BraspagRest::Request do
           headers: headers,
           timeout: config['request_timeout']
         )
-        described_class.void(request_id, payment_id, amount)
+        described_class.void(request_id, payment_id, amount, voids)
       end
     end
 
-    context 'when an amount is given' do
+    context 'when an amount and voids are given' do
       let(:void_url) { config['url'] + '/1/sales/' + payment_id + "/void?amount=#{amount}" }
       let(:amount) { 100 }
 
@@ -125,10 +133,11 @@ describe BraspagRest::Request do
         expect(RestClient::Request).to receive(:execute).with(
           method: :put,
           url: void_url,
+          payload: voids.inverse_attributes.to_json,
           headers: headers,
           timeout: config['request_timeout']
         )
-        described_class.void(request_id, payment_id, amount)
+        described_class.void(request_id, payment_id, amount, voids)
       end
     end
 
@@ -138,7 +147,7 @@ describe BraspagRest::Request do
       it 'returns a braspag successful response' do
         allow(RestClient::Request).to receive(:execute).and_return(gateway_response)
 
-        response = described_class.void(request_id, payment_id, amount)
+        response = described_class.void(request_id, payment_id, amount, voids)
         expect(response).to be_success
         expect(response.parsed_body).to eq({})
       end
@@ -151,7 +160,7 @@ describe BraspagRest::Request do
         allow(RestClient::Request).to receive(:execute).and_raise(RestClient::ExceptionWithResponse, gateway_response)
         expect(logger).to receive(:warn).with('[BraspagRest][Error] message: RestClient::ExceptionWithResponse, status: 400, body: "{}"')
 
-        response = described_class.void(request_id, payment_id, amount)
+        response = described_class.void(request_id, payment_id, amount, voids)
         expect(response).not_to be_success
         expect(response.parsed_body).to eq({})
       end
@@ -164,7 +173,7 @@ describe BraspagRest::Request do
         allow(RestClient::Request).to receive(:execute).and_raise(RestClient::Exception, gateway_response)
         expect(logger).to receive(:error).with('[BraspagRest][Error] message: RestClient::Exception, status: 500, body: "{}"')
 
-        expect { described_class.void(request_id, payment_id, amount) }.to raise_error(RestClient::Exception)
+        expect { described_class.void(request_id, payment_id, amount, voids) }.to raise_error(RestClient::Exception)
       end
     end
 
@@ -173,7 +182,7 @@ describe BraspagRest::Request do
         allow(RestClient::Request).to receive(:execute).and_raise(RestClient::RequestTimeout)
         expect(logger).to receive(:error).with('[BraspagRest][Timeout] message: Request Timeout')
 
-        expect { described_class.void(request_id, payment_id, amount) }.to raise_error(RestClient::RequestTimeout)
+        expect { described_class.void(request_id, payment_id, amount, voids) }.to raise_error(RestClient::RequestTimeout)
       end
     end
   end
