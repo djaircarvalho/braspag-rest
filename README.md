@@ -103,10 +103,10 @@ sale.save
 
 ```rb
 sale = BraspagRest::Sale.new(
-  order_id: '123456',
+  order_id: '201811201418',
   request_id: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
   customer: {
-    name: 'Comprador Teste'
+    name: 'Comprador Teste Accept'
   },
   payment: {
     type: 'CreditCard',
@@ -114,12 +114,12 @@ sale = BraspagRest::Sale.new(
     provider: 'Simulado',
     installments: 1,
     credit_card: {
-      number: '0000000000000001',
-      holder: 'Teste Holder',
-      expiration_date: '12/2021',
-      security_code: '123',
+      number: '4905045123937354',
+      holder: 'Elijah Rodriguez',
+      expiration_date: '05/2022',
+      security_code: '368',
       brand: 'Visa'
-    }
+    },
     fraud_analysis: {
       sequence: 'AuthorizeFirst',
       sequence_criteria: 'Always',

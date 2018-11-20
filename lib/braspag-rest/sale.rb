@@ -1,6 +1,7 @@
 module BraspagRest
   class Sale < Hashie::IUTrash
     include Hashie::Extensions::Coercion
+    attr_reader :response
 
     property :request_id, from: 'RequestId'
     property :order_id, from: 'MerchantOrderId'
@@ -12,7 +13,7 @@ module BraspagRest
     coerce_key :payment, BraspagRest::Payment
 
     def save
-      response = BraspagRest::Request.authorize(request_id, inverse_attributes)
+      self.response = BraspagRest::Request.authorize(request_id, inverse_attributes)
 
       if response.success?
         initialize_attributes(self.inverse_attributes.merge(response.parsed_body))
@@ -37,7 +38,7 @@ module BraspagRest
 
     def cancel(amount = nil, voids = nil)
       raise BraspagRest::NoVoidsGiven if amount && !voids
-      
+
       response = BraspagRest::Request.void(request_id, payment.id, amount, voids)
 
       if response.success?
@@ -74,5 +75,9 @@ module BraspagRest
     def splitted?
       payment.splitted?
     end
+
+    private
+
+    attr_writer :response
   end
 end
