@@ -26,7 +26,7 @@ module BraspagRest
     end
 
     def capture(amount = nil)
-      response = BraspagRest::Request.capture(request_id, payment.id, (amount || payment.amount))
+      self.response = BraspagRest::Request.capture(request_id, payment.id, (amount || payment.amount))
 
       if response.success?
         self.payment.initialize_attributes(self.payment.inverse_attributes.merge(response.parsed_body))
@@ -40,7 +40,7 @@ module BraspagRest
     def cancel(amount = nil, voids = nil)
       raise BraspagRest::NoVoidsGiven if amount && !voids
 
-      response = BraspagRest::Request.void(request_id, payment.id, amount, voids)
+      self.response = BraspagRest::Request.void(request_id, payment.id, amount, voids)
 
       if response.success?
         reload
@@ -52,7 +52,7 @@ module BraspagRest
     end
 
     def capture_with_split(splits)
-      response = BraspagRest::Request.capture_with_split(request_id, payment.id, splits)
+      self.response = BraspagRest::Request.capture_with_split(request_id, payment.id, splits)
 
       if response.success?
         self.payment.initialize_attributes(response.parsed_body)
@@ -73,13 +73,13 @@ module BraspagRest
     end
 
     def self.find(request_id, payment_id)
-      response = BraspagRest::Request.get_sale(request_id, payment_id)
+      self.response = BraspagRest::Request.get_sale(request_id, payment_id)
 
       new(response.parsed_body.merge('RequestId' => request_id))
     end
 
     def self.find_by_order_id(request_id, order_id)
-      response = BraspagRest::Request.get_sales_for_merchant_order_id(request_id, order_id)
+      self.response = BraspagRest::Request.get_sales_for_merchant_order_id(request_id, order_id)
       payments = response.parsed_body['Payments']
 
       Array(payments).map { |payment| BraspagRest::Sale.find(request_id, payment['PaymentId']) }
