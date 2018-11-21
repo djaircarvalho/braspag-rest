@@ -73,13 +73,13 @@ module BraspagRest
     end
 
     def self.find(request_id, payment_id)
-      self.response = BraspagRest::Request.get_sale(request_id, payment_id)
+      response = BraspagRest::Request.get_sale(request_id, payment_id)
 
       new(response.parsed_body.merge('RequestId' => request_id))
     end
 
     def self.find_by_order_id(request_id, order_id)
-      self.response = BraspagRest::Request.get_sales_for_merchant_order_id(request_id, order_id)
+      response = BraspagRest::Request.get_sales_for_merchant_order_id(request_id, order_id)
       payments = response.parsed_body['Payments']
 
       Array(payments).map { |payment| BraspagRest::Sale.find(request_id, payment['PaymentId']) }
