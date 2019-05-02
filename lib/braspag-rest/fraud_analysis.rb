@@ -29,7 +29,6 @@ module BraspagRest
     coerce_key :browser, BraspagRest::FraudAnalyses::Browser
     coerce_key :cart, BraspagRest::FraudAnalyses::Cart
     coerce_key :merchant_defined_fields, Array[BraspagRest::FraudAnalyses::MerchantDefinedFields]
-    coerce_key :reply_data, BraspagRest::FraudAnalyses::ReplyData
 
     def accepted?
       status.to_i.eql?(STATUS_ACCEPTED)
